@@ -1,0 +1,121 @@
+export type Result<T, E = Error> = Ok<T, E> | Err<T, E>;
+
+export class Ok<T, E = Error> {
+  readonly _tag = 'Ok' as const;
+  constructor(public readonly value: T) {}
+
+  isOk(): this is Ok<T, E> { return true; }
+  isErr(): this is Err<T, E> { return false; }
+
+  map<U>(fn: (value: T) => U): Result<U, E> {
+    return new Ok(fn(this.value));
+  }
+
+  mapErr<F>(_fn: (error: E) => F): Result<T, F> {
+    return new Ok(this.value);
+  }
+
+  flatMap<U>(fn: (value: T) => Result<U, E>): Result<U, E> {
+    return fn(this.value);
+  }
+
+  unwrap(): T {
+    return this.value;
+  }
+
+  unwrapOr(_defaultValue: T): T {
+    return this.value;
+  }
+
+  unwrapErr(): never {
+    throw new Error('Called unwrapErr on Ok');
+  }
+
+  match<U>(handlers: { ok: (value: T) => U; err: (error: E) => U }): U {
+    return handlers.ok(this.value);
+  }
+}
+
+export class Err<T, E = Error> {
+  readonly _tag = 'Err' as const;
+  constructor(public readonly error: E) {}
+
+  isOk(): this is Ok<T, E> { return false; }
+  isErr(): this is Err<T, E> { return true; }
+
+  map<U>(_fn: (value: T) => U): Result<U, E> {
+    return new Err(this.error);
+  }
+
+  mapErr<F>(fn: (error: E) => F): Result<T, F> {
+    return new Err(fn(this.error));
+  }
+
+  flatMap<U>(_fn: (value: T) => Result<U, E>): Result<U, E> {
+    return new Err(this.error);
+  }
+
+  unwrap(): never {
+    throw this.error instanceof Error ? this.error : new Error(String(this.error));
+  }
+
+  unwrapOr(defaultValue: T): T {
+    return defaultValue;
+  }
+
+  unwrapErr(): E {
+    return this.error;
+  }
+
+  match<U>(handlers: { ok: (value: T) => U; err: (error: E) => U }): U {
+    return handlers.err(this.error);
+  }
+}
+
+export function ok<T>(value: T): Ok<T, never> {
+  return new Ok(value);
+}
+
+export function err<E>(error: E): Err<never, E> {
+  return new Err(error);
+}
+
+export function tryCatch<T>(fn: () => T): Result<T, Error> {
+  try {
+    return new Ok(fn());
+  } catch (error) {
+    return new Err(error instanceof Error ? error : new Error(String(error)));
+  }
+}
+
+export async function tryCatchAsync<T>(fn: () => Promise<T>): Promise<Result<T, Error>> {
+  try {
+    return new Ok(await fn());
+  } catch (error) {
+    return new Err(error instanceof Error ? error : new Error(String(error)));
+  }
+}
+
+export async function fromPromise<T>(promise: Promise<T>): Promise<Result<T, Error>> {
+  try {
+    return new Ok(await promise);
+  } catch (error) {
+    return new Err(error instanceof Error ? error : new Error(String(error)));
+  }
+}
+
+export function all<T extends readonly Result<unknown, unknown>[]>(
+  results: [...T],
+): Result<
+  { [K in keyof T]: T[K] extends Result<infer V, unknown> ? V : never },
+  T[number] extends Result<unknown, infer E> ? E : never
+> {
+  const values: unknown[] = [];
+  for (const result of results) {
+    if (result.isErr()) {
+      return result as any;
+    }
+    values.push(result.unwrap());
+  }
+  return new Ok(values) as any;
+}
