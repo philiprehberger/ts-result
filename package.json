@@ -1,6 +1,6 @@
 {
   "name": "@philiprehberger/ts-result",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Rust-inspired Result type for type-safe error handling without try/catch",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -25,6 +25,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
+    "test": "node --test src/__tests__/index.test.mjs",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {

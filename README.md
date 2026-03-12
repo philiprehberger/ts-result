@@ -53,6 +53,23 @@ const name = tryCatch(() => JSON.parse(input))
   .unwrapOr('UNKNOWN');
 ```
 
+### Error Recovery
+
+```ts
+const result = err('not found')
+  .orElse(e => ok('fallback value'));
+// Ok('fallback value')
+```
+
+### Side Effects
+
+```ts
+tryCatch(() => JSON.parse(input))
+  .tap(data => console.log('Parsed:', data))
+  .tapErr(err => console.error('Parse failed:', err))
+  .map(data => data.name);
+```
+
 ### Type Guards
 
 ```ts

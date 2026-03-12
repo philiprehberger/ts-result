@@ -31,6 +31,19 @@ export class Ok<T, E = Error> {
     throw new Error('Called unwrapErr on Ok');
   }
 
+  orElse<F>(_fn: (error: E) => Result<T, F>): Result<T, F> {
+    return new Ok(this.value);
+  }
+
+  tap(fn: (value: T) => void): this {
+    fn(this.value);
+    return this;
+  }
+
+  tapErr(_fn: (error: E) => void): this {
+    return this;
+  }
+
   match<U>(handlers: { ok: (value: T) => U; err: (error: E) => U }): U {
     return handlers.ok(this.value);
   }
@@ -65,6 +78,19 @@ export class Err<T, E = Error> {
 
   unwrapErr(): E {
     return this.error;
+  }
+
+  orElse<F>(fn: (error: E) => Result<T, F>): Result<T, F> {
+    return fn(this.error);
+  }
+
+  tap(_fn: (value: T) => void): this {
+    return this;
+  }
+
+  tapErr(fn: (error: E) => void): this {
+    fn(this.error);
+    return this;
   }
 
   match<U>(handlers: { ok: (value: T) => U; err: (error: E) => U }): U {
@@ -104,18 +130,21 @@ export async function fromPromise<T>(promise: Promise<T>): Promise<Result<T, Err
   }
 }
 
+type AllOkValues<T extends readonly Result<unknown, unknown>[]> = {
+  [K in keyof T]: T[K] extends Result<infer V, unknown> ? V : never;
+};
+type AllErrType<T extends readonly Result<unknown, unknown>[]> =
+  T[number] extends Result<unknown, infer E> ? E : never;
+
 export function all<T extends readonly Result<unknown, unknown>[]>(
   results: [...T],
-): Result<
-  { [K in keyof T]: T[K] extends Result<infer V, unknown> ? V : never },
-  T[number] extends Result<unknown, infer E> ? E : never
-> {
+): Result<AllOkValues<T>, AllErrType<T>> {
   const values: unknown[] = [];
   for (const result of results) {
     if (result.isErr()) {
-      return result as any;
+      return new Err<AllOkValues<T>, AllErrType<T>>(result.unwrapErr() as AllErrType<T>);
     }
     values.push(result.unwrap());
   }
-  return new Ok(values) as any;
+  return new Ok<AllOkValues<T>, AllErrType<T>>(values as AllOkValues<T>);
 }
