@@ -47,6 +47,14 @@ export class Ok<T, E = Error> {
   match<U>(handlers: { ok: (value: T) => U; err: (error: E) => U }): U {
     return handlers.ok(this.value);
   }
+
+  toPromise(): Promise<T> {
+    return Promise.resolve(this.value);
+  }
+
+  filter(predicate: (value: T) => boolean, errorFactory: () => E): Result<T, E> {
+    return predicate(this.value) ? this : new Err(errorFactory());
+  }
 }
 
 export class Err<T, E = Error> {
@@ -96,6 +104,14 @@ export class Err<T, E = Error> {
   match<U>(handlers: { ok: (value: T) => U; err: (error: E) => U }): U {
     return handlers.err(this.error);
   }
+
+  toPromise(): Promise<T> {
+    return Promise.reject(this.error);
+  }
+
+  filter(_predicate: (value: T) => boolean, _errorFactory: () => E): Result<T, E> {
+    return this;
+  }
 }
 
 export function ok<T>(value: T): Ok<T, never> {
@@ -106,20 +122,37 @@ export function err<E>(error: E): Err<never, E> {
   return new Err(error);
 }
 
-export function tryCatch<T>(fn: () => T): Result<T, Error> {
+export function tryCatch<T>(fn: () => T): Result<T, Error>;
+export function tryCatch<T, E>(fn: () => T, mapError: (e: unknown) => E): Result<T, E>;
+export function tryCatch<T, E = Error>(fn: () => T, mapError?: (e: unknown) => E): Result<T, E> {
   try {
     return new Ok(fn());
   } catch (error) {
-    return new Err(error instanceof Error ? error : new Error(String(error)));
+    if (mapError) {
+      return new Err(mapError(error));
+    }
+    return new Err((error instanceof Error ? error : new Error(String(error))) as unknown as E);
   }
 }
 
-export async function tryCatchAsync<T>(fn: () => Promise<T>): Promise<Result<T, Error>> {
+export async function tryCatchAsync<T>(fn: () => Promise<T>): Promise<Result<T, Error>>;
+export async function tryCatchAsync<T, E>(fn: () => Promise<T>, mapError: (e: unknown) => E): Promise<Result<T, E>>;
+export async function tryCatchAsync<T, E = Error>(fn: () => Promise<T>, mapError?: (e: unknown) => E): Promise<Result<T, E>> {
   try {
     return new Ok(await fn());
   } catch (error) {
-    return new Err(error instanceof Error ? error : new Error(String(error)));
+    if (mapError) {
+      return new Err(mapError(error));
+    }
+    return new Err((error instanceof Error ? error : new Error(String(error))) as unknown as E);
   }
+}
+
+export function flatten<T, E>(result: Result<Result<T, E>, E>): Result<T, E> {
+  if (result.isOk()) {
+    return result.value;
+  }
+  return new Err(result.unwrapErr());
 }
 
 export async function fromPromise<T>(promise: Promise<T>): Promise<Result<T, Error>> {

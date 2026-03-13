@@ -102,6 +102,56 @@ const result = await fromPromise(fetch('/api'));
 // Result<Response, Error>
 ```
 
+### To Promise
+
+```ts
+const result = ok(42);
+await result.toPromise(); // resolves to 42
+
+const failure = err(new Error('fail'));
+await failure.toPromise(); // rejects with Error
+```
+
+### Filter
+
+```ts
+const result = ok(42).filter(
+  (n) => n > 0,
+  () => new Error('must be positive'),
+);
+// Ok(42)
+
+ok(-1).filter(
+  (n) => n > 0,
+  () => new Error('must be positive'),
+);
+// Err('must be positive')
+```
+
+### Flatten
+
+```ts
+import { flatten } from '@philiprehberger/ts-result';
+
+const nested = ok(ok(42)); // Result<Result<number, Error>, Error>
+const flat = flatten(nested); // Ok(42)
+```
+
+### Custom Error Mapper
+
+```ts
+const result = tryCatch(
+  () => JSON.parse(input),
+  (e) => ({ code: 'PARSE_ERROR', cause: e }),
+);
+// Result<unknown, { code: string; cause: unknown }>
+
+const asyncResult = await tryCatchAsync(
+  () => fetch('/api'),
+  (e) => new MyCustomError(e),
+);
+```
+
 ## License
 
 MIT
