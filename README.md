@@ -1,5 +1,9 @@
 # @philiprehberger/ts-result
 
+[![CI](https://github.com/philiprehberger/ts-result/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/ts-result/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/@philiprehberger/ts-result.svg)](https://www.npmjs.com/package/@philiprehberger/ts-result)
+[![License](https://img.shields.io/github/license/philiprehberger/ts-result)](LICENSE)
+
 Rust-inspired Result type for type-safe error handling without try/catch.
 
 ## Installation
