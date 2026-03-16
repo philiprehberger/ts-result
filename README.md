@@ -1,6 +1,6 @@
 # @philiprehberger/ts-result
 
-[![CI](https://github.com/philiprehberger/ts-result/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/ts-result/actions/workflows/ci.yml)
+[![CI](https://github.com/philiprehberger/ts-result/actions/workflows/publish.yml/badge.svg)](https://github.com/philiprehberger/ts-result/actions/workflows/publish.yml)
 [![npm version](https://img.shields.io/npm/v/@philiprehberger/ts-result.svg)](https://www.npmjs.com/package/@philiprehberger/ts-result)
 [![License](https://img.shields.io/github/license/philiprehberger/ts-result)](LICENSE)
 
@@ -154,6 +154,15 @@ const asyncResult = await tryCatchAsync(
   () => fetch('/api'),
   (e) => new MyCustomError(e),
 );
+```
+
+
+## Development
+
+```bash
+npm install
+npm run build
+npm test
 ```
 
 ## License

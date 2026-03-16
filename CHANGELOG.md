@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.3
+
+- Add Development section to README
+- Fix CI badge to reference publish.yml
+
 ## 0.3.0
 - Add `toPromise()` method on `Ok` and `Err` to bridge Result → Promise
 - Add `filter()` method on `Ok` to conditionally convert to `Err` via predicate

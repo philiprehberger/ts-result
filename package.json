@@ -1,6 +1,6 @@
 {
   "name": "@philiprehberger/ts-result",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Rust-inspired Result type for type-safe error handling without try/catch",
   "type": "module",
   "main": "./dist/index.cjs",
