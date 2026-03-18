@@ -4,7 +4,7 @@
 [![npm version](https://img.shields.io/npm/v/@philiprehberger/ts-result.svg)](https://www.npmjs.com/package/@philiprehberger/ts-result)
 [![License](https://img.shields.io/github/license/philiprehberger/ts-result)](LICENSE)
 
-Rust-inspired Result type for type-safe error handling without try/catch.
+Rust-inspired Result type for type-safe error handling without try/catch
 
 ## Installation
 
@@ -156,6 +156,39 @@ const asyncResult = await tryCatchAsync(
 );
 ```
 
+
+## API
+
+### Factory Functions
+
+| Function | Returns | Description |
+|----------|---------|-------------|
+| `ok(value)` | `Ok<T>` | Create a success result |
+| `err(error)` | `Err<E>` | Create a failure result |
+| `tryCatch(fn, mapError?)` | `Result<T, E>` | Wrap a throwing function |
+| `tryCatchAsync(fn, mapError?)` | `Promise<Result<T, E>>` | Wrap an async throwing function |
+| `fromPromise(promise)` | `Promise<Result<T, Error>>` | Convert a promise to a Result |
+| `all(results)` | `Result<T[], E>` | Collect an array of Results; returns first error |
+| `flatten(result)` | `Result<T, E>` | Unwrap a nested `Result<Result<T, E>, E>` |
+
+### Result Instance Methods
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `isOk()` | `boolean` | Type guard for Ok |
+| `isErr()` | `boolean` | Type guard for Err |
+| `map(fn)` | `Result<U, E>` | Transform the success value |
+| `mapErr(fn)` | `Result<T, F>` | Transform the error value |
+| `flatMap(fn)` | `Result<U, E>` | Chain with a Result-returning function |
+| `unwrap()` | `T` | Extract value or throw |
+| `unwrapOr(default)` | `T` | Extract value or return default |
+| `unwrapErr()` | `E` | Extract error or throw |
+| `orElse(fn)` | `Result<T, F>` | Recover from an error |
+| `tap(fn)` | `this` | Side effect on success value |
+| `tapErr(fn)` | `this` | Side effect on error value |
+| `match({ ok, err })` | `U` | Pattern match on Ok/Err |
+| `toPromise()` | `Promise<T>` | Convert to a Promise |
+| `filter(predicate, errorFactory)` | `Result<T, E>` | Keep Ok if predicate passes, else Err |
 
 ## Development
 
