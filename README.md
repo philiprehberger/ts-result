@@ -1,7 +1,7 @@
-# @philiprehberger/ts-result
+# @philiprehberger/result
 
 [![CI](https://github.com/philiprehberger/ts-result/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/ts-result/actions/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/@philiprehberger/ts-result.svg)](https://www.npmjs.com/package/@philiprehberger/ts-result)
+[![npm version](https://img.shields.io/npm/v/@philiprehberger/result.svg)](https://www.npmjs.com/package/@philiprehberger/result)
 [![License](https://img.shields.io/github/license/philiprehberger/ts-result)](LICENSE)
 
 Rust-inspired Result type for type-safe error handling without try/catch
@@ -9,7 +9,7 @@ Rust-inspired Result type for type-safe error handling without try/catch
 ## Installation
 
 ```bash
-npm install @philiprehberger/ts-result
+npm install @philiprehberger/result
 ```
 
 ## Usage
@@ -17,7 +17,7 @@ npm install @philiprehberger/ts-result
 ### Creating Results
 
 ```ts
-import { ok, err, tryCatch, tryCatchAsync } from '@philiprehberger/ts-result';
+import { ok, err, tryCatch, tryCatchAsync } from '@philiprehberger/result';
 
 const success = ok(42);
 const failure = err(new Error('something broke'));
@@ -88,7 +88,7 @@ if (result.isErr()) {
 ### Collecting Results
 
 ```ts
-import { all } from '@philiprehberger/ts-result';
+import { all } from '@philiprehberger/result';
 
 const results = all([ok(1), ok(2), ok(3)]);
 // Ok([1, 2, 3])
@@ -100,7 +100,7 @@ const withError = all([ok(1), err('fail'), ok(3)]);
 ### From Promise
 
 ```ts
-import { fromPromise } from '@philiprehberger/ts-result';
+import { fromPromise } from '@philiprehberger/result';
 
 const result = await fromPromise(fetch('/api'));
 // Result<Response, Error>
@@ -135,7 +135,7 @@ ok(-1).filter(
 ### Flatten
 
 ```ts
-import { flatten } from '@philiprehberger/ts-result';
+import { flatten } from '@philiprehberger/result';
 
 const nested = ok(ok(42)); // Result<Result<number, Error>, Error>
 const flat = flatten(nested); // Ok(42)

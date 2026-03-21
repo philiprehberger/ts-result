@@ -1,5 +1,5 @@
 {
-  "name": "@philiprehberger/ts-result",
+  "name": "@philiprehberger/result",
   "version": "0.3.3",
   "description": "Rust-inspired Result type for type-safe error handling without try/catch",
   "type": "module",
