@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0
+
+- Add `partition(results)` returning `{ oks, errs }` for splitting `Result[]`
+- Add `combine` as an alias of `all`
+- Add `mapAsync` and `flatMapAsync` instance methods on `Ok` and `Err`
+
 ## 0.3.5
 
 - Standardize README to 3-badge format with emoji Support section

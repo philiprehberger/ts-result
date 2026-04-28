@@ -88,13 +88,20 @@ if (result.isErr()) {
 ### Collecting Results
 
 ```ts
-import { all } from '@philiprehberger/result';
+import { all, combine, partition } from '@philiprehberger/result';
 
 const results = all([ok(1), ok(2), ok(3)]);
 // Ok([1, 2, 3])
 
 const withError = all([ok(1), err('fail'), ok(3)]);
 // Err('fail') — returns first error
+
+// combine is an alias of all
+combine([ok(1), ok(2)]);
+
+// partition keeps every result and splits oks from errs
+const { oks, errs } = partition([ok(1), err('a'), ok(2)]);
+// oks = [1, 2], errs = ['a']
 ```
 
 ### From Promise
@@ -168,6 +175,8 @@ const asyncResult = await tryCatchAsync(
 | `tryCatchAsync(fn, mapError?)` | `Promise<Result<T, E>>` | Wrap an async throwing function |
 | `fromPromise(promise)` | `Promise<Result<T, Error>>` | Convert a promise to a Result |
 | `all(results)` | `Result<T[], E>` | Collect an array of Results; returns first error |
+| `combine(results)` | `Result<T[], E>` | Alias of `all` |
+| `partition(results)` | `{ oks, errs }` | Split a list of Results into success and failure values |
 | `flatten(result)` | `Result<T, E>` | Unwrap a nested `Result<Result<T, E>, E>` |
 
 ### Result Instance Methods
@@ -188,6 +197,8 @@ const asyncResult = await tryCatchAsync(
 | `match({ ok, err })` | `U` | Pattern match on Ok/Err |
 | `toPromise()` | `Promise<T>` | Convert to a Promise |
 | `filter(predicate, errorFactory)` | `Result<T, E>` | Keep Ok if predicate passes, else Err |
+| `mapAsync(fn)` | `Promise<Result<U, E>>` | Async version of `map` |
+| `flatMapAsync(fn)` | `Promise<Result<U, E>>` | Async version of `flatMap` |
 
 ## Development
 
