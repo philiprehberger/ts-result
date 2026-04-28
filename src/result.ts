@@ -55,6 +55,14 @@ export class Ok<T, E = Error> {
   filter(predicate: (value: T) => boolean, errorFactory: () => E): Result<T, E> {
     return predicate(this.value) ? this : new Err(errorFactory());
   }
+
+  async mapAsync<U>(fn: (value: T) => Promise<U>): Promise<Result<U, E>> {
+    return new Ok(await fn(this.value));
+  }
+
+  async flatMapAsync<U>(fn: (value: T) => Promise<Result<U, E>>): Promise<Result<U, E>> {
+    return fn(this.value);
+  }
 }
 
 export class Err<T, E = Error> {
@@ -111,6 +119,14 @@ export class Err<T, E = Error> {
 
   filter(_predicate: (value: T) => boolean, _errorFactory: () => E): Result<T, E> {
     return this;
+  }
+
+  async mapAsync<U>(_fn: (value: T) => Promise<U>): Promise<Result<U, E>> {
+    return new Err(this.error);
+  }
+
+  async flatMapAsync<U>(_fn: (value: T) => Promise<Result<U, E>>): Promise<Result<U, E>> {
+    return new Err(this.error);
   }
 }
 
@@ -180,4 +196,16 @@ export function all<T extends readonly Result<unknown, unknown>[]>(
     values.push(result.unwrap());
   }
   return new Ok<AllOkValues<T>, AllErrType<T>>(values as AllOkValues<T>);
+}
+
+export const combine = all;
+
+export function partition<T, E>(results: readonly Result<T, E>[]): { oks: T[]; errs: E[] } {
+  const oks: T[] = [];
+  const errs: E[] = [];
+  for (const result of results) {
+    if (result.isOk()) oks.push(result.unwrap());
+    else errs.push(result.unwrapErr());
+  }
+  return { oks, errs };
 }
